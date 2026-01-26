@@ -52,6 +52,9 @@ static GLOBAL: mimalloc_safe::MiMalloc = mimalloc_safe::MiMalloc;
 
 const DEFAULT_OXLINTRC_NAME: &str = ".oxlintrc.json";
 const DEFAULT_TS_OXLINTRC_NAME: &str = "oxlint.config.ts";
+// Aliases used by LSP/dynamic-config code.
+const DEFAULT_OXLINTRC: &str = DEFAULT_OXLINTRC_NAME;
+const DEFAULT_TS_OXLINTRC: &str = DEFAULT_TS_OXLINTRC_NAME;
 
 /// Return a JSON blob containing metadata for all available oxlint rules.
 ///

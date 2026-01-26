@@ -12,10 +12,27 @@ mod utils;
 
 /// Run the language server
 pub async fn run_lsp(external_linter: Option<ExternalLinter>) {
+    run_lsp_with_builder(crate::lsp::server_linter::ServerLinterBuilder::new(external_linter))
+        .await;
+}
+
+#[cfg(feature = "napi")]
+pub async fn run_lsp_with_js_config_loader(
+    external_linter: Option<ExternalLinter>,
+    js_config_loader: Option<crate::lint::JsConfigLoaderCb>,
+) {
+    run_lsp_with_builder(
+        crate::lsp::server_linter::ServerLinterBuilder::new(external_linter)
+            .with_js_config_loader(js_config_loader),
+    )
+    .await;
+}
+
+async fn run_lsp_with_builder(builder: crate::lsp::server_linter::ServerLinterBuilder) {
     oxc_language_server::run_server(
         "oxlint".to_string(),
         env!("CARGO_PKG_VERSION").to_string(),
-        vec![Box::new(crate::lsp::server_linter::ServerLinterBuilder::new(external_linter))],
+        vec![Box::new(builder)],
     )
     .await;
 }
