@@ -7,6 +7,8 @@ describe("Vue <script> tag formatting via API", () => {
 import z from "z";
 import a from "a";
 const x = 1;
+
+const s = css\`color:#000\`;
 </script>
 <template><div>Hello</div></template>`;
 
@@ -15,6 +17,7 @@ const x = 1;
     });
 
     expect(result.code).toContain('import a from "a";\nimport z from "z";');
+    expect(result.code).toContain("color: #000;");
     expect(result.errors).toStrictEqual([]);
   });
 

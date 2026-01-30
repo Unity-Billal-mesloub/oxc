@@ -10,31 +10,43 @@
  * for embedded JavaScript in Vue/HTML files.
  */
 
-import type { Parser, Printer, Plugin, Options, Doc } from "prettier";
 import { doc } from "prettier";
-import { formatToDoc } from "../bindings";
-import { formatEmbeddedCode, sortTailwindClasses } from "./prettier";
+import { format } from "../index";
+import type { Parser, Printer, Options, Doc } from "prettier";
 
 const { hardline, join } = doc.builders;
 
-/**
- * Try to parse a JSON string option and restore it to the result object.
- */
-function restoreJsonOption(
-  source: Record<string, unknown>,
-  target: Record<string, unknown>,
-  jsonKey: string,
-  resultKey: string,
-): void {
-  const jsonValue = source[jsonKey];
-  if (typeof jsonValue !== "string" || jsonValue === "") return;
+const oxfmtParser: Parser = {
+  parse: async (jsInXxxSourceText: string, textToDocOptions: Options) => {
+    // NOTE: For (j|t)s-in-xxx, `parser` is either `babel` or `typescript`.
+    // We need to infer `SourceType` by `filename` for `oxc_formatter`.
+    const parser = textToDocOptions.parser as string;
+    const filepath = textToDocOptions.filepath as string;
+    let filename = "";
+    if (parser === "typescript") {
+      // In case of ts-in-md, `filepath` is overridden to distinguish TSX or TS
+      if (filepath.endsWith(".tsx")) {
+        filename = "dummy.tsx";
+      } else {
+        filename = "dummy.ts";
+      }
+    } else {
+      // Always enable JSX for js-in-xxx, it's safe
+      filename = "dummy.jsx";
+    }
 
-  try {
-    target[resultKey] = JSON.parse(jsonValue);
-  } catch {
-    // Ignore parse errors
-  }
-}
+    const { code } = await format(
+      filename,
+      jsInXxxSourceText,
+      extractSerializableOptions(textToDocOptions),
+    );
+
+    return code;
+  },
+  astFormat: "OXFMT",
+  locStart: () => -1,
+  locEnd: () => -1,
+};
 
 /**
  * Extract only serializable options from Prettier options.
@@ -72,50 +84,22 @@ function extractSerializableOptions(options: Options): Record<string, unknown> {
   restoreJsonOption(anyOptions, result, "_experimentalTailwindcssJson", "experimentalTailwindcss");
 
   return result;
-}
 
-function createOxcParser(): Parser {
-  return {
-    parse: async (text: string, options: Options) => {
-      // NOTE: For (j|t)s-in-xxx, `parser` is either `babel` or `typescript`.
-      // We need to infer `SourceType` by `filename` for `oxc_formatter`.
-      const parser = options.parser as string;
-      const filepath = options.filepath as string;
-      let filename = "";
-      if (parser === "typescript") {
-        // In case of ts-in-md, `filepath` is overridden to distinguish TSX or TS
-        if (filepath.endsWith(".tsx")) {
-          filename = "dummy.tsx";
-        } else {
-          filename = "dummy.ts";
-        }
-      } else {
-        // Always enable JSX for js-in-xxx, it's safe
-        filename = "dummy.jsx";
-      }
+  function restoreJsonOption(
+    source: Record<string, unknown>,
+    target: Record<string, unknown>,
+    jsonKey: string,
+    resultKey: string,
+  ): void {
+    const jsonValue = source[jsonKey];
+    if (typeof jsonValue !== "string" || jsonValue === "") return;
 
-      // Extract only serializable options to pass to Rust
-      const serializableOptions = extractSerializableOptions(options);
-
-      // Call oxc_formatter via NAPI with Prettier options
-      // Options are converted to FormatOptions on the Rust side
-      const formatted = await formatToDoc(
-        filepath,
-        filename,
-        text,
-        serializableOptions,
-        // Embedded formatter callback (CSS-in-JS, etc.)
-        async (_opts, parserName, code) => formatEmbeddedCode({ code, parserName, options }),
-        // Tailwind class sorter callback
-        async (fp, opts, classes) => sortTailwindClasses({ filepath: fp, classes, options: opts }),
-      );
-
-      return formatted;
-    },
-    astFormat: "OXFMT",
-    locStart: () => -1,
-    locEnd: () => -1,
-  };
+    try {
+      target[resultKey] = JSON.parse(jsonValue);
+    } catch {
+      // Ignore parse errors
+    }
+  }
 }
 
 /**
@@ -127,7 +111,7 @@ function createOxcParser(): Parser {
  */
 const oxfmtPrinter: Printer = {
   print: ({ node }): Doc => {
-    const str = node as string;
+    const str = node! as string;
     const lines = str.split(/\r?\n/);
 
     // Single line: return as-is
@@ -140,6 +124,8 @@ const oxfmtPrinter: Printer = {
   },
 };
 
+// ---
+
 /**
  * Prettier plugin for oxc_formatter.
  *
@@ -149,31 +135,29 @@ const oxfmtPrinter: Printer = {
  * Note: Prettier's option system doesn't support object types, so we use
  * JSON strings for the actual configuration and boolean flags for detection.
  */
-const plugin: Plugin = {
-  options: {
-    // JSON string containing the experimentalSortImports options
-    _experimentalSortImportsJson: {
-      type: "string",
-      category: "JavaScript",
-      description: "JSON string for sort imports options (internal)",
-      default: "",
-    },
-    // JSON string containing the experimentalTailwindcss options
-    _experimentalTailwindcssJson: {
-      type: "string",
-      category: "JavaScript",
-      description: "JSON string for Tailwind CSS options (internal)",
-      default: "",
-    },
+export const options = {
+  // JSON string containing the experimentalSortImports options
+  _experimentalSortImportsJson: {
+    type: "string",
+    category: "JavaScript",
+    description: "JSON string for sort imports options (internal)",
+    default: "",
   },
-  parsers: {
-    // Override default JS/TS parsers
-    babel: createOxcParser(),
-    typescript: createOxcParser(),
-  },
-  printers: {
-    OXFMT: oxfmtPrinter,
+  // JSON string containing the experimentalTailwindcss options
+  _experimentalTailwindcssJson: {
+    type: "string",
+    category: "JavaScript",
+    description: "JSON string for Tailwind CSS options (internal)",
+    default: "",
   },
 };
 
-export default plugin;
+export const parsers: Record<string, Parser> = {
+  // Override default JS/TS parsers
+  babel: oxfmtParser,
+  typescript: oxfmtParser,
+};
+
+export const printers: Record<string, Printer> = {
+  OXFMT: oxfmtPrinter,
+};

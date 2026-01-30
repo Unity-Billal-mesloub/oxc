@@ -22,7 +22,7 @@ async function loadOxcPlugin(): Promise<Plugin> {
   if (oxcPluginCache) return oxcPluginCache;
 
   const module = await import("./prettier-plugin-oxc");
-  oxcPluginCache = module.default;
+  oxcPluginCache = module as Plugin;
   return oxcPluginCache;
 }
 
@@ -94,9 +94,6 @@ function serializeObjectOption(options: Options, sourceKey: string, targetKey: s
   }
 }
 
-// Parsers that contain embedded JavaScript (need oxc plugin)
-const PARSERS_WITH_EMBEDDED_JS = new Set(["vue", "html", "angular", "svelte", "astro"]);
-
 /**
  * Format non-js file
  *
@@ -125,14 +122,14 @@ export async function formatFile({
   // Prettier resolves parsers from the LAST plugin first, so oxc must be last
   // FormatOptions are cached on Rust side before this function is called
   // if (PARSERS_WITH_EMBEDDED_JS.has(parserName)) {
-    const oxcPlugin = await loadOxcPlugin();
-    options.plugins = options.plugins || [];
-    options.plugins.push(oxcPlugin);
+  const oxcPlugin = await loadOxcPlugin();
+  options.plugins = options.plugins || [];
+  options.plugins.push(oxcPlugin);
 
-    // Convert object options to JSON strings so they survive Prettier's option normalization
-    // Prettier only preserves options that are defined in plugins, and only supports primitive types
-    serializeObjectOption(options, "experimentalSortImports", "_experimentalSortImportsJson");
-    serializeObjectOption(options, "experimentalTailwindcss", "_experimentalTailwindcssJson");
+  // Convert object options to JSON strings so they survive Prettier's option normalization
+  // Prettier only preserves options that are defined in plugins, and only supports primitive types
+  serializeObjectOption(options, "experimentalSortImports", "_experimentalSortImportsJson");
+  serializeObjectOption(options, "experimentalTailwindcss", "_experimentalTailwindcssJson");
   // }
 
   return prettier.format(code, options);
