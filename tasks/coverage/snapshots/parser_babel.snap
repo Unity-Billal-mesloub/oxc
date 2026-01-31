@@ -12165,6 +12165,12 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/typesc
    ╰────
 
   × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/jsx/errors/unclosed-jsx-element/input.js:1:6]
+ 1 │ <div>() => {}
+   ·      ────
+   ╰────
+
+  × Unexpected token
    ╭─[babel/packages/babel-parser/test/fixtures/placeholders/_errors/no-plugin/input.js:1:1]
  1 │ %%FOO%%
    · ─
@@ -12245,6 +12251,14 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/typesc
  1 │ // Generics without trailing comma are disallowed in JSX
  2 │ <T>(a: T): T => a;
    ·               ▲
+ 3 │ 
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/typescript/arrow-function/generic-tsx/input.ts:2:4]
+ 1 │ // Generics without trailing comma are disallowed in JSX
+ 2 │ <T>(a: T): T => a;
+   ·    ───────────
  3 │ 
    ╰────
 
@@ -14035,6 +14049,12 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/typesc
    ·        ▲
    ╰────
 
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/typescript/tsx/invalid-gt-arrow-like/input.ts:1:4]
+ 1 │ <T>() => {}</T>;
+   ·    ────
+   ╰────
+
   × Expected a semicolon or an implicit semicolon after a statement, but found none
    ╭─[babel/packages/babel-parser/test/fixtures/typescript/type-alias/declare-new-line/input.ts:1:8]
  1 │ declare type
@@ -14386,6 +14406,14 @@ Expect to Parse: tasks/coverage/babel/packages/babel-parser/test/fixtures/typesc
  1 │ // valid JSX
  2 │ <in T>() => {}</in>;
    ·           ▲
+ 3 │ 
+   ╰────
+
+  × Unexpected token
+   ╭─[babel/packages/babel-parser/test/fixtures/typescript/types/variance-annotations-with-jsx/input.tsx:2:7]
+ 1 │ // valid JSX
+ 2 │ <in T>() => {}</in>;
+   ·       ────
  3 │ 
    ╰────
 

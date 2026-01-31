@@ -4196,6 +4196,16 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
    · ──
    ╰────
 
+  × Expected corresponding JSX closing tag for 'div'.
+   ╭─[typescript/tests/cases/compiler/conflictMarkerTrivia3.tsx:2:1]
+ 1 │ const x = <div>
+   ·            ─┬─
+   ·             ╰── Opened here
+ 2 │ <<<<<<< HEAD
+   · ─┬
+   ·  ╰── Expected `</div>`
+   ╰────
+
   × Encountered diff marker
    ╭─[typescript/tests/cases/compiler/conflictMarkerTrivia4.ts:2:1]
  1 │ const x = <div>
@@ -5642,6 +5652,15 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
  10 │ 
  11 │ let y = <   Baz >Hello
     ·                  ─────
+    ╰────
+
+  × Expected corresponding JSX closing tag for 'Baz'.
+    ╭─[typescript/tests/cases/compiler/errorSpanForUnclosedJsxTag.tsx:11:18]
+ 10 │ 
+ 11 │ let y = <   Baz >Hello
+    ·             ─┬─  ──┬──
+    ·              │     ╰── Expected `</Baz>`
+    ·              ╰── Opened here
     ╰────
 
   × 'with' statements are not allowed
@@ -9442,11 +9461,19 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
    ╰────
 
   × Unexpected token
+   ╭─[typescript/tests/cases/compiler/parseUnaryExpressionNoTypeAssertionInJsx2.ts:2:15]
+ 1 │ const x = "oops";
+ 2 │ const y = + <> x;
+   ·               ───
+   ╰────
+
+  × Unexpected JSX expression
    ╭─[typescript/tests/cases/compiler/parseUnaryExpressionNoTypeAssertionInJsx2.ts:2:13]
  1 │ const x = "oops";
  2 │ const y = + <> x;
-   ·             ─
+   ·             ──
    ╰────
+  help: JSX syntax is disabled and should be enabled via the parser options
 
   × Unexpected token
    ╭─[typescript/tests/cases/compiler/parseUnaryExpressionNoTypeAssertionInJsx3.ts:2:13]
@@ -9460,6 +9487,25 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
  4 │ const b = + <> x;
  5 │ const c = + <1234> x;
    ·              ────
+   ╰────
+
+  × Unexpected token
+   ╭─[typescript/tests/cases/compiler/parseUnaryExpressionNoTypeAssertionInJsx4.ts:5:14]
+ 4 │ const b = + <> x;
+ 5 │ const c = + <1234> x;
+   ·              ────
+   ╰────
+
+  × Expected corresponding JSX closing tag for 'number'.
+   ╭─[typescript/tests/cases/compiler/parseUnaryExpressionNoTypeAssertionInJsx4.ts:5:14]
+ 2 │ 
+ 3 │ const a = + <number> x;
+   ·              ───┬──
+   ·                 ╰── Opened here
+ 4 │ const b = + <> x;
+ 5 │ const c = + <1234> x;
+   ·              ──┬─
+   ·                ╰── Expected `</number>`
    ╰────
 
   × Unexpected token
@@ -20767,6 +20813,14 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
     ╰────
 
   × Unexpected token
+    ╭─[typescript/tests/cases/conformance/jsx/jsxEsprimaFbTestSuite.tsx:40:32]
+ 39 │ 
+ 40 │ <LeftRight left=<a /> right=<b>monkeys /> gorillas</b> />;
+    ·                                ─────────
+ 41 │ 
+    ╰────
+
+  × Unexpected token
    ╭─[typescript/tests/cases/conformance/jsx/jsxInvalidEsprimaTestSuite.tsx:3:2]
  2 │ 
  3 │ </>;
@@ -20797,7 +20851,22 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
    ·                           ──
    ╰────
 
+  × Expected corresponding JSX closing tag for 'div'.
+   ╭─[typescript/tests/cases/conformance/jsx/jsxParsingError2.tsx:2:27]
+ 1 │ // Issue error about missing span closing tag, not missing div closing tag
+ 2 │ let x1 = <div><span></div>;
+   ·           ─┬─             ─┬
+   ·            │               ╰── Expected `</div>`
+   ·            ╰── Opened here
+   ╰────
+
   × Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+   ╭─[typescript/tests/cases/conformance/jsx/jsxParsingError3.tsx:1:15]
+ 1 │ let x1 = <div>}</div>;
+   ·               ▲
+   ╰────
+
+  × Unexpected token
    ╭─[typescript/tests/cases/conformance/jsx/jsxParsingError3.tsx:1:15]
  1 │ let x1 = <div>}</div>;
    ·               ▲
@@ -20836,6 +20905,19 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
  13 │ function noName() { }
     ╰────
 
+  × Expected corresponding JSX closing tag for 'div'.
+    ╭─[typescript/tests/cases/conformance/jsx/jsxUnclosedParserRecovery.ts:12:1]
+  9 │ 
+ 10 │ var donkey = <div>
+    ·               ─┬─
+    ·                ╰── Opened here
+ 11 │     <
+ 12 │ </div>;
+    · ┬
+    · ╰── Expected `</div>`
+ 13 │ function noName() { }
+    ╰────
+
   × Invalid characters after number
     ╭─[typescript/tests/cases/conformance/jsx/tsxAttributeInvalidNames.tsx:10:10]
   9 │ // Invalid names
@@ -20866,13 +20948,21 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
    ·       ─
    ╰────
 
-  × Expected `>` but found `Identifier`
+  × Expected corresponding JSX closing tag for ''.
     ╭─[typescript/tests/cases/conformance/jsx/tsxFragmentErrors.tsx:9:7]
   8 │ 
   9 │ <>hi</div> // Error
-    ·       ─┬─
-    ·        ╰── `>` expected
+    · ─┬    ─┬─
+    ·  │     ╰── Expected `</>`
+    ·  ╰── Opened here
  10 │ 
+    ╰────
+
+  × Unexpected token
+    ╭─[typescript/tests/cases/conformance/jsx/tsxFragmentErrors.tsx:11:2]
+ 10 │ 
+ 11 │ <>eof   // Error
+    ·  ─
     ╰────
 
   × Unexpected token. Did you mean `{'>'}` or `&gt;`?
@@ -20880,6 +20970,14 @@ Expect to Parse: tasks/coverage/typescript/tests/cases/conformance/statements/Va
  7 │ // This is an element
  8 │ var x1 = <T>() => {}</T>;
    ·                 ▲
+ 9 │ x1.isElement;
+   ╰────
+
+  × Unexpected token
+   ╭─[typescript/tests/cases/conformance/jsx/tsxGenericArrowFunctionParsing.tsx:8:13]
+ 7 │ // This is an element
+ 8 │ var x1 = <T>() => {}</T>;
+   ·             ────
  9 │ x1.isElement;
    ╰────
 
