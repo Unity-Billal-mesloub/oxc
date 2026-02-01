@@ -176,12 +176,13 @@ export async function testFixtureWithCommand(options: TestFixtureOptions): Promi
   await expect(snapshot).toMatchFileSnapshot(snapshotPath);
 }
 
+const NORMALIZED_REPO_ROOT = normalizeSlashes(REPO_ROOT_PATH);
 // Regexp to match paths in output.
 // Matches `/path/to/oxc`, `/path/to/oxc/`, `/path/to/oxc/whatever`,
 // when preceded by whitespace, `(`, or a quote, and followed by whitespace, `)`, or a quote.
 const PATH_REGEXP = new RegExp(
   // @ts-expect-error - `RegExp.escape` is new in NodeJS v24
-  `(?<=^|[\\s\\('"\`])${RegExp.escape(REPO_ROOT_PATH)}(${RegExp.escape(pathSep)}[^\\s\\)'"\`]*)?(?=$|[\\s\\)'"\`])`,
+  `(?<=^|[\\s\\('"\`])${RegExp.escape(NORMALIZED_REPO_ROOT).replace(/\\\//g, "[\\\\/]")}(?:([\\/][^\\s\\)'"\`]*)?)?(?=$|[\\s\\)'"\`])`,
   "g",
 );
 
