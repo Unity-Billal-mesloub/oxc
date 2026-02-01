@@ -182,7 +182,7 @@ const NORMALIZED_REPO_ROOT = normalizeSlashes(REPO_ROOT_PATH);
 // when preceded by whitespace, `(`, or a quote, and followed by whitespace, `)`, or a quote.
 const PATH_REGEXP = new RegExp(
   // @ts-expect-error - `RegExp.escape` is new in NodeJS v24
-  `(?<=^|[\\s\\('"\`])${RegExp.escape(NORMALIZED_REPO_ROOT).replace(/\\\//g, "[\\\\/]")}(?:([\\/][^\\s\\)'"\`]*)?)?(?=$|[\\s\\)'"\`])`,
+  `(?<=^|[\\s\\('"\`])${RegExp.escape(NORMALIZED_REPO_ROOT).replace(/\\\//g, "[\\\\/]")}([\\/][^\\s\\)'"\`]*)?(?=$|[\\s\\)'"\`])`,
   "g",
 );
 
