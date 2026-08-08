@@ -21,7 +21,7 @@ catalog:
   rolldown: 1.0.0-rc.2
   tsdown: 0.20.1
   typescript: 5.9.3
-  vitest: 4.0.18
+  vitest: 4.1.0
 
 onlyBuiltDependencies:
   - "@vscode/vsce-sign@2.0.8"
